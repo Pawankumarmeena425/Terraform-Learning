@@ -220,13 +220,13 @@ resource "aws_route_table_association" "subnet_association_public" {
 }
 
 // Private  Route Table Association 
-# resource "aws_route_table_association" "ig_association_private" {
-#   gateway_id     = aws_internet_gateway.gw.id
-#   route_table_id = aws_route_table.rt-private.id
-# }
-# resource "aws_route_table_association" "subnet_association_private" {
-#   count          = var.private_subnet_no
-#   subnet_id      = aws_subnet.private_subnet[count.index].id
-#   route_table_id = aws_route_table.rt-private.id
-# }
+resource "aws_route_table_association" "ig_association_private" {
+  gateway_id     = aws_internet_gateway.gw.id
+  route_table_id = aws_route_table.rt-private.id
+}
+resource "aws_route_table_association" "subnet_association_private" {
+  count          = var.private_subnet_no
+  subnet_id      = aws_subnet.private_subnet[count.index].id
+  route_table_id = aws_route_table.rt-private.id
+}
 
