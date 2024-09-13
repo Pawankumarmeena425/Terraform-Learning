@@ -109,7 +109,7 @@ resource "aws_network_acl" "nacl-public" {
   vpc_id = aws_vpc.my_aws_infra.id
 
   egress {
-    protocol   = "tcp"
+    protocol   = -1
     rule_no    = 100
     action     = "allow"
     cidr_block = "0.0.0.0/0"
@@ -118,12 +118,12 @@ resource "aws_network_acl" "nacl-public" {
   }
 
   ingress {
-    protocol   = "tcp"
+    protocol   = -1
     rule_no    = 100
     action     = "allow"
     cidr_block = "0.0.0.0/0"
-    from_port  = 22
-    to_port    = 22
+    from_port  = 0
+    to_port    = 0
   }
 
   tags = {
@@ -136,7 +136,7 @@ resource "aws_network_acl" "nacl-private" {
   vpc_id = aws_vpc.my_aws_infra.id
 
   egress {
-    protocol   = "tcp"
+    protocol   = -1
     rule_no    = 100
     action     = "allow"
     cidr_block = "0.0.0.0/0"
@@ -180,8 +180,8 @@ resource "aws_network_acl_association" "association-private-sub" {
 resource "aws_route_table" "rt-public" {
   vpc_id = aws_vpc.my_aws_infra.id
   route {
-    cidr_block = var.vpc_cidr
-    gateway_id = "lcoal"
+    cidr_block ="0.0.0.0/0"
+    gateway_id =  aws_internet_gateway.gw.id
   }
   tags = {
     Name = "public-rt"
@@ -192,8 +192,8 @@ resource "aws_route_table" "rt-public" {
 resource "aws_route_table" "rt-private" {
   vpc_id = aws_vpc.my_aws_infra.id
   route {
-    cidr_block = var.vpc_cidr
-    gateway_id =  "local"
+    cidr_block = "0.0.0.0/0"
+    gateway_id =  aws_internet_gateway.gw.id
   }
   tags = {
     Name = "private-rt"
@@ -209,10 +209,10 @@ resource "aws_internet_gateway" "gw" {
 }
 
 // Public Route Table Association 
-resource "aws_route_table_association" "ig_association_public" {
-  gateway_id     = aws_internet_gateway.gw.id
-  route_table_id = aws_route_table.rt-public.id
-}
+# resource "aws_route_table_association" "ig_association_public" {
+#   gateway_id     = aws_internet_gateway.gw.id
+#   route_table_id = aws_route_table.rt-public.id
+# }
 resource "aws_route_table_association" "subnet_association_public" {
   count          = min(var.public_subnet_no, local.za_length)
   subnet_id      = aws_subnet.public_subnet[count.index].id
@@ -220,10 +220,10 @@ resource "aws_route_table_association" "subnet_association_public" {
 }
 
 // Private  Route Table Association 
-resource "aws_route_table_association" "ig_association_private" {
-  gateway_id     = aws_internet_gateway.gw.id
-  route_table_id = aws_route_table.rt-private.id
-}
+# resource "aws_route_table_association" "ig_association_private" {
+#   gateway_id     = aws_internet_gateway.gw.id
+#   route_table_id = aws_route_table.rt-private.id
+# }
 resource "aws_route_table_association" "subnet_association_private" {
   count          = var.private_subnet_no
   subnet_id      = aws_subnet.private_subnet[count.index].id
